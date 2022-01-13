@@ -3,6 +3,10 @@ import json
 import requests
 import re
 import sys
+from bs4 import BeautifulSoup
+from markdown import markdown
+
+import html2text
 from urllib.parse import urlparse
 
 class PyCrawler(object):
@@ -16,7 +20,7 @@ class PyCrawler(object):
         except Exception as e:
             print(e)
             return ""
-        return html.content.decode('latin-1')
+        return html.content.decode('utf-8')
 
     def get_links(self, url):
         html = self.get_html(url)
@@ -31,9 +35,16 @@ class PyCrawler(object):
         return set(filter(lambda x: 'mailto' not in x, links))
 
     def extract_info(self, url):
+        #dont know any better methord
         html = self.get_html(url)
-        meta = re.findall("<meta .*?name=[\"'](.*?)['\"].*?content=[\"'](.*?)['\"].*?>", html)
-        return dict(meta)
+        data=[]
+        try:
+            soup = BeautifulSoup(html, "html.parser")
+            tag = soup.body
+            for string in tag.strings:
+            	data.append(str(string))
+        except:pass
+        return data
 
     def crawl(self, url):
         for link in self.get_links(url):
@@ -66,7 +77,7 @@ class PyCrawler(object):
         self.crawl(self.starting_url)
 
 if __name__ == "__main__":
-    url= "https://wikipedia.org/"
+    url= "https://github.com/"
     with open("data.json",'r') as file:
         json_data=json.load(file)
         x=list(json_data.keys())
