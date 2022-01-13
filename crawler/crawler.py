@@ -37,14 +37,14 @@ class PyCrawler(object):
     def extract_info(self, url):
         #dont know any better methord
         html = self.get_html(url)
-        data=[]
+        data=""
         try:
             soup = BeautifulSoup(html, "html.parser")
             tag = soup.body
             for string in tag.strings:
-            	data.append(str(string))
+            	data+=str(string)
         except:pass
-        return data
+        return data.replace("\n","").replace("/n","")
 
     def crawl(self, url):
         for link in self.get_links(url):
